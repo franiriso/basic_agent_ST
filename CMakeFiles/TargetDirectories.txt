@@ -1,0 +1,3 @@
+/Users/franiriso/Documents/UNITN/1S/Intelligent Vehicles and Autonomous Driving/IVAD/basic_agent_st/CMakeFiles/basic_agent.dir
+/Users/franiriso/Documents/UNITN/1S/Intelligent Vehicles and Autonomous Driving/IVAD/basic_agent_st/CMakeFiles/edit_cache.dir
+/Users/franiriso/Documents/UNITN/1S/Intelligent Vehicles and Autonomous Driving/IVAD/basic_agent_st/CMakeFiles/rebuild_cache.dir

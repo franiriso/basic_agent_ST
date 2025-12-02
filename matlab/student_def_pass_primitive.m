@@ -5,19 +5,20 @@
 %
 %
 %% Determine the optimal final velocity to pass
-% final_opt_vel_pass_var = ...
-% final_opt_vel_pass_fun = ...
+
+final_opt_vel_pass_var = solve(diff(subs(total_cost_var, af, 0), vf) == 0, vf);
+final_opt_vel_pass_fun = matlabFunction(final_opt_vel_pass_var, 'Vars', [v0,a0,sf,T], 'File', 'final_opt_vel_pass.m');
 % - Use functions 'solve', 'diff', 'subs', and 'matlabFunction'
 
 %% Determine the optimal time to reach to final velocity
-sym z; % We create this variable for more stable solution of the equations
+syms z; % We create this frequency variable for more stable solution of the equations
 
-% final_opt_time_pass_var = ...
-% final_opt_time_pass_fun = ...
+final_opt_time_pass_var = 1./solve(subs(final_opt_vel_pass_var, T, 1/z) == vf, z); % 1./ to invert from frequency to time
+final_opt_time_pass_fun = matlabFunction(final_opt_time_pass_var(2), 'Vars', [v0,a0,sf,vf], 'File', 'final_opt_time_pass.m'); % (1) (2) check which one is positive
 % - Use the function solve 
 %   Use 'subs' function to solve the system using the frequency instead of the time
 
 %% Determine the time to reach the minimum velocity
-% time_min_vel_var = ...
-% time_min_vel_fun = ...
+time_min_vel_var = 1./solve(diff(subs(final_opt_vel_pass_var, T, 1/z), z) == 0, z);
+time_min_vel_fun = matlabFunction(time_min_vel_var(2), 'Vars', [a0,sf], 'File', 'time_min_vel.m');
 % - Use functions 'solve', 'diff', 'subs', and 'matlabFunction'
