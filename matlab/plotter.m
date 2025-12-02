@@ -11,10 +11,10 @@ data = readtable('../../bin/log_internal/acc_test.csv', 'Delimiter', {',', ';'})
 
 % Plot acceleration data
 subplot(2,1,1); hold on;
-plot(data.time, data.acc, 'b-');
+plot(data.time, data.a0, 'b-');
 plot(data.time, data.requested_acc, 'r');
 subplot(2,1,2); hold on;
-plot(data.time, data.vel, 'b-');
+plot(data.time, data.v0, 'b-');
 plot(data.time, data.requested_vel, 'r');
 
 % Add labels and title
@@ -70,9 +70,9 @@ end
 % end
 
 h1 = plot(data_test.time, data_test.requested_vel,' r--', 'DisplayName', 'Requested Velocity', LineWidth=2);
-h2 = plot(data_test.time, data_test.vel, 'b-', 'DisplayName', 'Velocity', LineWidth=1);
+h2 = plot(data_test.time, data_test.v0, 'b-', 'DisplayName', 'Velocity', LineWidth=1);
 legend([h1, h2]);
-ylim([-1 20])
+ylim([-1 30])
 
 
 %% Read the CSV file
@@ -112,6 +112,6 @@ for i=1:size(coeffs,1)
 end
 
 h1 = plot(s0-data.distance, data_test.requested_vel,' r--', 'DisplayName', 'Requested Velocity', LineWidth=2);
-h2 = plot(s0-data.distance, data_test.vel, 'b-', 'DisplayName', 'Velocity', LineWidth=1);
+h2 = plot(s0-data.distance, data_test.v0, 'b-', 'DisplayName', 'Velocity', LineWidth=1);
 legend([h1, h2]);
-ylim([-1 20])
+ylim([-1 30])

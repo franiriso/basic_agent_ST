@@ -39,15 +39,40 @@ void unsafe_coeffs_a_opt_mexFunction(int32_T nlhs, mxArray *plhs[1],
 void unsafe_coeffs_v_opt_mexFunction(int32_T nlhs, mxArray *plhs[1],
                                      int32_T nrhs, const mxArray *prhs[2]);
 
+void unsafe_final_opt_pos_j0_mexFunction(int32_T nlhs, mxArray *plhs[1],
+                                         int32_T nrhs, const mxArray *prhs[6]);
+
+void unsafe_final_opt_time_j0_pass_mexFunction(int32_T nlhs, mxArray *plhs[1],
+                                               int32_T nrhs,
+                                               const mxArray *prhs[3]);
+
+void unsafe_final_opt_time_stop_mexFunction(int32_T nlhs, mxArray *plhs[1],
+                                            int32_T nrhs,
+                                            const mxArray *prhs[3]);
+
+void unsafe_final_opt_vel_j0_pass_mexFunction(int32_T nlhs, mxArray *plhs[1],
+                                              int32_T nrhs,
+                                              const mxArray *prhs[6]);
+
 void unsafe_j_opt_mexFunction(int32_T nlhs, mxArray *plhs[1], int32_T nrhs,
                               const mxArray *prhs[7]);
 
 void unsafe_s_opt_mexFunction(int32_T nlhs, mxArray *plhs[1], int32_T nrhs,
                               const mxArray *prhs[7]);
 
+void unsafe_student_pass_primitive_j0_mexFunction(int32_T nlhs,
+                                                  mxArray *plhs[1],
+                                                  int32_T nrhs,
+                                                  const mxArray *prhs[5]);
+
 void unsafe_student_pass_primitive_mexFunction(int32_T nlhs, mxArray *plhs[6],
                                                int32_T nrhs,
                                                const mxArray *prhs[7]);
+
+void unsafe_student_stop_primitive_j0_mexFunction(int32_T nlhs,
+                                                  mxArray *plhs[3],
+                                                  int32_T nrhs,
+                                                  const mxArray *prhs[2]);
 
 void unsafe_student_stop_primitive_mexFunction(int32_T nlhs, mxArray *plhs[3],
                                                int32_T nrhs,

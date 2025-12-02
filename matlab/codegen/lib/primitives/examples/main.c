@@ -73,10 +73,16 @@ You can call entry-point functions multiple times. */
   main_coef_list();
   main_coeffs_a_opt();
   main_coeffs_v_opt();
+  main_final_opt_pos_j0();
+  main_final_opt_time_j0_pass();
+  main_final_opt_time_stop();
+  main_final_opt_vel_j0_pass();
   main_j_opt();
   main_s_opt();
   main_student_pass_primitive();
+  main_student_pass_primitive_j0();
   main_student_stop_primitive();
+  main_student_stop_primitive_j0();
   main_v_opt();
   /* Terminate the application.
 You do not need to do this more than one time. */
@@ -125,6 +131,44 @@ void main_coeffs_v_opt(void)
   b_coeffs_v_opt = coeffs_v_opt(argInit_real_T(), dv);
 }
 
+void main_final_opt_pos_j0(void)
+{
+  double v0_tmp;
+  /* Initialize function 'final_opt_pos_j0' input arguments. */
+  v0_tmp = argInit_real_T();
+  /* Call the entry-point 'final_opt_pos_j0'. */
+  v0_tmp = final_opt_pos_j0(v0_tmp, v0_tmp, v0_tmp, v0_tmp, v0_tmp, v0_tmp);
+}
+
+void main_final_opt_time_j0_pass(void)
+{
+  double final_opt_time_j0_pass_var[2];
+  double v0_tmp;
+  /* Initialize function 'final_opt_time_j0_pass' input arguments. */
+  v0_tmp = argInit_real_T();
+  /* Call the entry-point 'final_opt_time_j0_pass'. */
+  final_opt_time_j0_pass(v0_tmp, v0_tmp, v0_tmp, final_opt_time_j0_pass_var);
+}
+
+void main_final_opt_time_stop(void)
+{
+  double v0_tmp;
+  /* Initialize function 'final_opt_time_stop' input arguments. */
+  v0_tmp = argInit_real_T();
+  /* Call the entry-point 'final_opt_time_stop'. */
+  v0_tmp = final_opt_time_stop(v0_tmp, v0_tmp, v0_tmp);
+}
+
+void main_final_opt_vel_j0_pass(void)
+{
+  double v0_tmp;
+  /* Initialize function 'final_opt_vel_j0_pass' input arguments. */
+  v0_tmp = argInit_real_T();
+  /* Call the entry-point 'final_opt_vel_j0_pass'. */
+  v0_tmp =
+      final_opt_vel_j0_pass(v0_tmp, v0_tmp, v0_tmp, v0_tmp, v0_tmp, v0_tmp);
+}
+
 void main_j_opt(void)
 {
   double t_tmp;
@@ -159,6 +203,16 @@ void main_student_pass_primitive(void)
                          coeffsT2, &v2, &T2, coeffsT1, &v1, &T1);
 }
 
+void main_student_pass_primitive_j0(void)
+{
+  double coefsj0[6];
+  double v0_tmp;
+  /* Initialize function 'student_pass_primitive_j0' input arguments. */
+  v0_tmp = argInit_real_T();
+  /* Call the entry-point 'student_pass_primitive_j0'. */
+  student_pass_primitive_j0(v0_tmp, v0_tmp, v0_tmp, v0_tmp, v0_tmp, coefsj0);
+}
+
 void main_student_stop_primitive(void)
 {
   double coefs[6];
@@ -169,6 +223,18 @@ void main_student_stop_primitive(void)
   v0_tmp = argInit_real_T();
   /* Call the entry-point 'student_stop_primitive'. */
   student_stop_primitive(v0_tmp, v0_tmp, v0_tmp, coefs, &maxsf, &tf);
+}
+
+void main_student_stop_primitive_j0(void)
+{
+  double coefsj0[6];
+  double sfj0;
+  double tfj0;
+  double v0_tmp;
+  /* Initialize function 'student_stop_primitive_j0' input arguments. */
+  v0_tmp = argInit_real_T();
+  /* Call the entry-point 'student_stop_primitive_j0'. */
+  student_stop_primitive_j0(v0_tmp, v0_tmp, coefsj0, &sfj0, &tfj0);
 }
 
 void main_v_opt(void)

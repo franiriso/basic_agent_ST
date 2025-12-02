@@ -82,31 +82,91 @@ int main(int argc, const char * argv[]) {
             logger.log_var("Example", "v0", in->VLgtFild);
 
             // ADD AGENT CODE HERE
-            double lookhead_distance = max(50, v0*5.0);
-            // double requested_acc = 0.1;
-            // static double requested_vel = 0.0;
-            // requested_vel = requested_vel + requested_acc * DT;
-
-            // student_pass_primitive(vel, acc, distTrafficLight, 0, 90, 0, 40, coefT2, &v2, &t2, coefT1, &v1, &t1);
-            // student_stop_primitive(vel, acc, distTrafficLight, coef, &maxsf, &tf);
-
-            // static double final_time = 20.0;
-            // double requested_acc = a_opt(DT, vel, acc, distTrafficLight, 20, 0, final_time - in->ECUupTime);
-            // double requested_vel = v_opt(DT, vel, acc, distTrafficLight, 20, 0, final_time - in->ECUupTime);
-            // double coef[6];
-            // coef_list(vel, acc, distTrafficLight, requested_vel, requested_acc, final_time, coef);
-
             double coef[6];
+            double coef_1[6];
+            double coef_2[6];
+            static double coef_zeros[6] = {0, 0, 0, 0, 0, 0};
             double finalDistance;
             double finalTime;
             double finalVel;
+            double finalTime_1;
+            double finalVel_1;
+            double finalTime_2;
+            double finalVel_2;
+            
+            double lookhead_distance = std::max(50.0, v0*5.0);
+            double vmin = 3.0;
+            double vmax = 15.0;
+            double vr = in->RequestedCruisingSpeed;
+            double xs = 5.0; //minimum distance at which the traffic light must be green if the vehicle is to pass
+            double Ts = xs/vmin; // time to safety space
+            double xin = 10.0; // length of intersection
+            double Tin = xin/vmin; // time to pass the intersection
 
-            // if(distTrafficLight < 50) {
-            //     student_stop_primitive(vel, acc, distTrafficLight, coef, &finalDistance, &finalTime);
-            // } else {
-            //     student_pass_primitive(vel, acc, distTrafficLight, 15, 15, 0, 0, coef, &finalVel, &finalTime, coef, &finalVel, &finalTime);
-            // }
-
+            double xtr = lookhead_distance;
+            double T_green;
+            double T_red;
+            if(in->NrTrfLights != 0) {
+                xtr = distTrafficLight;
+                double xstop = distTrafficLight - xs / 2.0;
+            }
+            if(in->NrTrfLights == 0 || xtr >= lookhead_distance) {
+                student_pass_primitive(v0, a0, lookhead_distance, vr, vr, 0, 0, coef, &finalVel, &finalTime, coef, &finalVel, &finalTime);
+            } else {
+                switch (in->TrfLightCurrState) {
+                case 1: // green light
+                    T_green = 0;
+                    T_red = in->TrfLightFirstTimeToChange - Tin;
+                    break;
+                case 2: // yellow light
+                    T_green = in->TrfLightSecondTimeToChange + Ts;
+                    T_red = in->TrfLightThirdTimeToChange - Tin;
+                    break;
+                case 3:
+                    T_green = in->TrfLightFirstTimeToChange + Ts;
+                    T_red = in->TrfLightSecondTimeToChange - Tin;
+                    break;
+                default:
+                    break;
+                }
+                if (in->TrfLightCurrState == 1 && distTrafficLight <= xs){
+                    printLog(message_id, "Green, distance is less than safety, passing");
+                    student_pass_primitive(v0, a0, lookhead_distance, vr, vr, 0, 0, coef, &finalVel, &finalTime, coef, &finalVel, &finalTime);
+                } else {
+                    student_pass_primitive(v0, a0, xtr, vmin, vmax, T_green, T_red, coef_2, &finalVel_2, &finalTime_2, coef_1, &finalVel_1, &finalTime_1);
+                    char buffer[256];
+                    snprintf(buffer, sizeof(buffer), "coef_1 = [%.3f, %.3f, %.3f, %.3f, %.3f, %.3f]",  coef_1[0], coef_1[1], coef_1[2], coef_1[3], coef_1[4], coef_1[5]);
+                    printLogVar(message_id,"coef_1", buffer);
+                    snprintf(buffer, sizeof(buffer), "coef_1 = [%.3f, %.3f, %.3f, %.3f, %.3f, %.3f]",  coef_2[0], coef_2[1], coef_2[2], coef_2[3], coef_2[4], coef_2[5]);
+                    printLogVar(message_id,"coef_2", buffer);
+                    bool coef_1_0 = true, coef_2_0 = true;
+                    for (int i = 0; i < 6; i++) {
+                        if (coef_1[i] != 0) coef_1_0 = false;
+                        if (coef_2[i] != 0) coef_2_0 = false;
+                    }
+                    if (coef_1_0 && coef_2_0) {
+                        student_stop_primitive(v0, a0, xs, coef, &finalDistance, &finalTime);
+                        printLog(message_id, "Stopping");
+                    } else {
+                        if ((coef_1[3]<0 && coef_2[3]>0) || (coef_1[3]>0 && coef_2[3]<0)) {
+                            student_pass_primitive_j0(v0, a0, xtr, vmin, vmax, coef);
+                            printLog(message_id, "j0");
+                        } else {
+                            if (std::abs(coef_1[3]) < std::abs(coef_2[3])) {
+                                printLog(message_id, "Taking coef_1");
+                                for (int i = 0; i < 6; i++) {
+                                    coef[i] = coef_1[i];
+                                }
+                            } else {
+                                printLog(message_id, "Taking coef_2");
+                                for (int i = 0; i < 6; i++) {
+                                    coef[i] = coef_2[i];
+                                }
+                            }
+                        }
+                    }
+                }
+            }
             // double requested_acc = a_opt(DT, vel, acc, distTrafficLight, 20, 0, finalTime - in->ECUupTime);
             double requested_acc = coeffs_a_opt(DT, coef);
             // double requested_vel = v_opt(DT, vel, acc, distTrafficLight, 20, 0, finalTime - in->ECUupTime);

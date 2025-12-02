@@ -45,6 +45,28 @@ real_T coeffs_v_opt(real_T t, real_T in2[6]);
 
 void coeffs_v_opt_api(const mxArray *const prhs[2], const mxArray **plhs);
 
+real_T final_opt_pos_j0(real_T v0, real_T a0, real_T b_j0, real_T vf, real_T af,
+                        real_T T);
+
+void final_opt_pos_j0_api(const mxArray *const prhs[6], const mxArray **plhs);
+
+void final_opt_time_j0_pass(real_T v0, real_T a0, real_T sf,
+                            real_T final_opt_time_j0_pass_var[2]);
+
+void final_opt_time_j0_pass_api(const mxArray *const prhs[3],
+                                const mxArray **plhs);
+
+real_T final_opt_time_stop(real_T v0, real_T a0, real_T sf);
+
+void final_opt_time_stop_api(const mxArray *const prhs[3],
+                             const mxArray **plhs);
+
+real_T final_opt_vel_j0_pass(real_T v0, real_T a0, real_T b_j0, real_T af,
+                             real_T sf, real_T T);
+
+void final_opt_vel_j0_pass_api(const mxArray *const prhs[6],
+                               const mxArray **plhs);
+
 real_T j_opt(real_T t, real_T v0, real_T a0, real_T sf, real_T vf, real_T af,
              real_T T);
 
@@ -73,11 +95,23 @@ void student_pass_primitive(real_T v0, real_T a0, real_T sf, real_T vfmin,
 void student_pass_primitive_api(const mxArray *const prhs[7], int32_T nlhs,
                                 const mxArray *plhs[6]);
 
+void student_pass_primitive_j0(real_T v0, real_T a0, real_T sf, real_T vfmin,
+                               real_T vfmax, real_T coefsj0[6]);
+
+void student_pass_primitive_j0_api(const mxArray *const prhs[5],
+                                   const mxArray **plhs);
+
 void student_stop_primitive(real_T v0, real_T a0, real_T sf, real_T coefs[6],
                             real_T *maxsf, real_T *tf);
 
 void student_stop_primitive_api(const mxArray *const prhs[3], int32_T nlhs,
                                 const mxArray *plhs[3]);
+
+void student_stop_primitive_j0(real_T v0, real_T a0, real_T coefsj0[6],
+                               real_T *sfj0, real_T *tfj0);
+
+void student_stop_primitive_j0_api(const mxArray *const prhs[2], int32_T nlhs,
+                                   const mxArray *plhs[3]);
 
 real_T v_opt(real_T t, real_T v0, real_T a0, real_T sf, real_T vf, real_T af,
              real_T T);
