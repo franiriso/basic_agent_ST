@@ -206,11 +206,14 @@ void main_student_pass_primitive(void)
 void main_student_pass_primitive_j0(void)
 {
   double coefsj0[6];
+  double tfj0;
   double v0_tmp;
+  double vfj0;
   /* Initialize function 'student_pass_primitive_j0' input arguments. */
   v0_tmp = argInit_real_T();
   /* Call the entry-point 'student_pass_primitive_j0'. */
-  student_pass_primitive_j0(v0_tmp, v0_tmp, v0_tmp, v0_tmp, v0_tmp, coefsj0);
+  student_pass_primitive_j0(v0_tmp, v0_tmp, v0_tmp, v0_tmp, v0_tmp, coefsj0,
+                            &vfj0, &tfj0);
 }
 
 void main_student_stop_primitive(void)

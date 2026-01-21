@@ -61,7 +61,7 @@ void unsafe_s_opt_mexFunction(int32_T nlhs, mxArray *plhs[1], int32_T nrhs,
                               const mxArray *prhs[7]);
 
 void unsafe_student_pass_primitive_j0_mexFunction(int32_T nlhs,
-                                                  mxArray *plhs[1],
+                                                  mxArray *plhs[3],
                                                   int32_T nrhs,
                                                   const mxArray *prhs[5]);
 

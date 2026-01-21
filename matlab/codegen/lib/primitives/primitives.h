@@ -61,7 +61,8 @@ extern void student_pass_primitive(double v0, double a0, double sf,
 
 extern void student_pass_primitive_j0(double v0, double a0, double sf,
                                       double vfmin, double vfmax,
-                                      double coefsj0[6]);
+                                      double coefsj0[6], double *vfj0,
+                                      double *tfj0);
 
 extern void student_stop_primitive(double v0, double a0, double sf,
                                    double coefs[6], double *maxsf, double *tf);

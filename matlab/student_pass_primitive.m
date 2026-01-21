@@ -12,8 +12,8 @@ function [coeffsT2, v2, T2, coeffsT1, v1, T1] = student_pass_primitive(v0, a0, s
         Tvmin = final_opt_time_pass(v0, a0, sf, vfmin);
         Tvmax = final_opt_time_pass(v0, a0, sf, vfmax);
     else
-        Tstar = sqrt(15*sf / (-a0));
-        vstar = (1/4) * (sqrt(15 - a0*sf) - 7*v0);
+        Tstar = time_min_vel(a0, sf);
+        vstar = final_opt_vel_pass(v0, a0, sf, Tstar);
         if (vstar < vfmin) && (vfmin < vfmax)
             Tvmin = final_opt_time_pass(v0, a0, sf, vfmin);
             Tvmax = final_opt_time_pass(v0, a0, sf, vfmax);
@@ -34,7 +34,7 @@ function [coeffsT2, v2, T2, coeffsT1, v1, T1] = student_pass_primitive(v0, a0, s
         T2 = min(Tvmin, Tmax);
     end
 
-    if (0 < T1) && (T1 <= T2)
+    if (0 < T1) && (T1 <= T2) && (Tvmax <= Tvmin)
         v1 = final_opt_vel_pass(v0, a0, sf, T2);
         v2 = final_opt_vel_pass(v0, a0, sf, T1);
         coeffsT1 = coef_list(v0, a0, sf, v2, 0., T1);

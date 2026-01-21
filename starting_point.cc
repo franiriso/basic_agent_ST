@@ -93,22 +93,135 @@ int main(int argc, const char * argv[]) {
             double finalVel_1;
             double finalTime_2;
             double finalVel_2;
+
+            //  double lookhead;
+            // if (50*vel > 50) { 
+            //     lookhead = 50*vel; 
+            // } else {
+            //     lookhead = 50;
+            // }
+
+            // double coef1[6];
+            // double coef2[6];
+            // double vmin = 3;
+            // double vmax = 15;
+            // double vr = requested_vel;
+            // double xs = 5;
+            // double ts = xs/vmin;
+            // double xin = 10;
+            // double tin = xin/vmin;
+            // double numTrafficLight = in ->NrTrfLights;
+            // double TLCurrentState = in ->TrfLightCurrState;
+            // double TimeFirstChange = in ->TrfLightFirstTimeToChange;
+            // double TimeSecondChange = in ->TrfLightSecondTimeToChange;
+            // double TimeThirdChange = in ->TrfLightThirdTimeToChange;
+            // double xtr;
+            // double xstop;
+            // double tgreen;
+            // double tred;
+            
+            // if (numTrafficLight != 0) {
+
+            //     xtr = distTrafficLight;
+            //     xstop = distTrafficLight - xs/2;
+            // }
+
+            // // CASE 1: NO TRAFFIC LIGHT OR FAR AWAY → FREE FLOW
+            // if (numTrafficLight == 0 || xtr >= lookhead) {
+            //     student_pass_primitive(vel, acc, lookhead, requested_vel, requested_vel, 0, 0, coef, &finalVel, &finalTime, coef, &finalVel, &finalTime);
+            // } 
+            
+            // // CASE 2: VALID TRAFFIC LIGHT → PROCESS STATES
+            // else {
+            //     switch (in->TrfLightCurrState)
+            //     {
+            //     case 1: // Red
+            //         tgreen = 0;
+            //         tred = TimeFirstChange - tin;
+            //         break;
+            //     case 2: // Green
+            //         tgreen = TimeSecondChange + ts;
+            //         tred = TimeThirdChange - tin;
+            //         break; 
+                
+            //     case 3: // Yellow
+            //         tgreen = TimeFirstChange + ts;
+            //         tred = TimeSecondChange - tin;
+            //         break;
+            //     }
+
+            //     // If we are too close to RED, don't try anything → FREE FLOW (just coast)
+            //     if (TLCurrentState == 1 && distTrafficLight <= xs) {
+            //         student_pass_primitive(vel, acc, lookhead, requested_vel, requested_vel, 0, 0, coef, &finalVel, &finalTime, coef, &finalVel, &finalTime);
+
+            //     }
+
+            //     // Otherwise → compute Pass options for current traffic light
+            //     else {
+            //         student_pass_primitive(vel, acc, distTrafficLight, vmin, vmax, tgreen, tred, coef1, &finalVel, &finalTime, coef2, &finalVel, &finalTime);
+
+            //         // Defining coefs 1 and 2 emptyness
+            //         bool empty1 = (coef1[0] == 0 && coef1[1] == 0 && coef1[2] == 0 &&
+            //            coef1[3] == 0 && coef1[4] == 0 && coef1[5] == 0);
+                    
+            //         bool empty2 = (coef2[0] == 0 && coef2[1] == 0 && coef2[2] == 0 &&
+            //            coef2[3] == 0 && coef2[4] == 0 && coef2[5] == 0);
+
+
+            //         // CASE A: Both coefs empty --> STOP TRAJECTORY
+            //         if (empty1 && empty2) {
+            //             student_stop_primitive(vel, acc, xstop, coef, &finalDistance, &finalTime);
+            //         }
+
+            //         // CASE B: Only one valid --> CHOOSE IT
+            //         else if (!empty1 && empty2) {
+            //             memcpy(coef, coef1, sizeof(coef1));
+            //         }
+            //         else if (!empty1 && empty2) {
+            //             memcpy(coef, coef2, sizeof(coef2));
+            //         }
+
+            //         // CASE C: Both valid --> CHECK SIGN CHANGE
+            //         else if ((coef1[3] < 0 && coef2[3] > 0) || (coef1[3] > 0 && coef2[3] < 0)) {
+            //             student_pass_primitive_j0(vel, acc, xtr, vmin, vmax, coef, &finalVel, &finalTime);
+            //         }
+
+            //         // CASE D: Both valid, same sign --> SMALLEST MAGNITUDE
+            //         else {
+            //             if (fabs(coef1[3]) < fabs(coef2[3])) {
+            //                 memcpy(coef, coef1, sizeof(coef1));
+            //             } 
+            //             else {
+            //                 memcpy(coef, coef2, sizeof(coef2));
+            //             }
+            //         }
+            //     }
+            // }
+
+            double requested_acc = coeffs_a_opt(DT, coef);
+            double requested_vel = coeffs_v_opt(DT, coef);
+            double requested_acc_limited = std::max(-5.0, std::min(5.0, requested_acc));
+            double a0_limited = std::max(-5.0, std::min(5.0, a0));
+
             
             double lookhead_distance = std::max(50.0, v0*5.0);
-            double vmin = 3.0;
-            double vmax = 15.0;
-            double vr = in->RequestedCruisingSpeed;
+            static double vmin = 3.0;
+            static double vmax = 15.0;
+            double vr = requested_vel;
+            // double vr = in->RequestedCruisingSpeed;
             double xs = 5.0; //minimum distance at which the traffic light must be green if the vehicle is to pass
             double Ts = xs/vmin; // time to safety space
             double xin = 10.0; // length of intersection
             double Tin = xin/vmin; // time to pass the intersection
+            
+            static double xstop;
+            static double xtr;
+            static double T_green;
+            static double T_red;
 
-            double xtr = lookhead_distance;
-            double T_green;
-            double T_red;
             if(in->NrTrfLights != 0) {
                 xtr = distTrafficLight;
-                double xstop = distTrafficLight - xs / 2.0;
+                xstop = distTrafficLight - xs / 2.0;
             }
             if(in->NrTrfLights == 0 || xtr >= lookhead_distance) {
                 student_pass_primitive(v0, a0, lookhead_distance, vr, vr, 0, 0, coef, &finalVel, &finalTime, coef, &finalVel, &finalTime);
@@ -134,22 +247,23 @@ int main(int argc, const char * argv[]) {
                     student_pass_primitive(v0, a0, lookhead_distance, vr, vr, 0, 0, coef, &finalVel, &finalTime, coef, &finalVel, &finalTime);
                 } else {
                     student_pass_primitive(v0, a0, xtr, vmin, vmax, T_green, T_red, coef_2, &finalVel_2, &finalTime_2, coef_1, &finalVel_1, &finalTime_1);
-                    char buffer[256];
-                    snprintf(buffer, sizeof(buffer), "coef_1 = [%.3f, %.3f, %.3f, %.3f, %.3f, %.3f]",  coef_1[0], coef_1[1], coef_1[2], coef_1[3], coef_1[4], coef_1[5]);
-                    printLogVar(message_id,"coef_1", buffer);
-                    snprintf(buffer, sizeof(buffer), "coef_1 = [%.3f, %.3f, %.3f, %.3f, %.3f, %.3f]",  coef_2[0], coef_2[1], coef_2[2], coef_2[3], coef_2[4], coef_2[5]);
-                    printLogVar(message_id,"coef_2", buffer);
+                    // char buffer[256];
+                    // snprintf(buffer, sizeof(buffer), "coef_1 = [%.3f, %.3f, %.3f, %.3f, %.3f, %.3f]",  coef_1[0], coef_1[1], coef_1[2], coef_1[3], coef_1[4], coef_1[5]);
+                    // printLogVar(message_id,"coef_1", buffer);
+                    // snprintf(buffer, sizeof(buffer), "coef_1 = [%.3f, %.3f, %.3f, %.3f, %.3f, %.3f]",  coef_2[0], coef_2[1], coef_2[2], coef_2[3], coef_2[4], coef_2[5]);
+                    // printLogVar(message_id,"coef_2", buffer);
                     bool coef_1_0 = true, coef_2_0 = true;
                     for (int i = 0; i < 6; i++) {
                         if (coef_1[i] != 0) coef_1_0 = false;
                         if (coef_2[i] != 0) coef_2_0 = false;
                     }
                     if (coef_1_0 && coef_2_0) {
-                        student_stop_primitive(v0, a0, xs, coef, &finalDistance, &finalTime);
+                        student_stop_primitive(v0, a0, xstop, coef, &finalDistance, &finalTime);
                         printLog(message_id, "Stopping");
                     } else {
                         if ((coef_1[3]<0 && coef_2[3]>0) || (coef_1[3]>0 && coef_2[3]<0)) {
-                            student_pass_primitive_j0(v0, a0, xtr, vmin, vmax, coef);
+                            student_pass_primitive_j0(v0, a0, xtr, vmin, vmax, coef, &finalVel, &finalTime);
+
                             printLog(message_id, "j0");
                         } else {
                             if (std::abs(coef_1[3]) < std::abs(coef_2[3])) {
@@ -167,22 +281,35 @@ int main(int argc, const char * argv[]) {
                     }
                 }
             }
-            // double requested_acc = a_opt(DT, vel, acc, distTrafficLight, 20, 0, finalTime - in->ECUupTime);
-            double requested_acc = coeffs_a_opt(DT, coef);
-            // double requested_vel = v_opt(DT, vel, acc, distTrafficLight, 20, 0, finalTime - in->ECUupTime);
-            double requested_vel = coeffs_v_opt(DT, coef);
+
+            // double requested_acc = coeffs_a_opt(DT, coef);
+            // double requested_vel = coeffs_v_opt(DT, coef);
 
             // ADD LOW LEVEL CONTROL CODE HERE
-            // double initial_acc;
-            // requested_acc = initial_acc + 
             double P_gain = 0.4;
             double I_gain = 1.0;
+            // double W_gain = 1.0; // Windup gain
 
-            double error = requested_acc - a0;
+            double aw_gain = 0.5;
+            double sat_error = (requested_acc_limited - requested_acc) - (a0_limited - a0);
+            double error = (requested_acc - a0) + aw_gain * sat_error;
+            if (std::abs(error) < 0.05) {
+                error = 0.0;
+            }
+            // static double sat_error = 0.0;
             static double integral_error = 0.0;
             integral_error = integral_error + error * DT;
-            double requested_pedal = P_gain * error + integral_error * I_gain; // Requested pedal
-            // double requested_pedal = 1.0;
+            double requested_pedal = P_gain * error + integral_error * I_gain;
+            if (requested_vel < 0.1 && std::abs(v0) < 0.1) {
+                integral_error = 0.0;
+                requested_pedal = 0.0;
+            }
+
+            // double requested_pedal_unsat = P_gain * error + integral_error * I_gain;
+            // double requested_pedal_sat = std::max(-5.0, std::min(5.0, requested_pedal_unsat));
+
+            // sat_error = requested_pedal_sat - requested_pedal_unsat;
+            // integral_error = integral_error + (error + W_gain*sat_error)* DT;
 
             manoeuvre_msg.data_struct.RequestedAcc = requested_pedal; //RequestedAcc is actually RequestedPedal
             manoeuvre_msg.data_struct.RequestedSteerWhlAg = 0.0;
@@ -190,6 +317,8 @@ int main(int argc, const char * argv[]) {
             logger.log_var("acc_test", "time", in->ECUupTime);
             logger.log_var("acc_test", "a0", a0);
             logger.log_var("acc_test", "requested_acc", requested_acc);
+            logger.log_var("acc_test", "requested_acc_limited", requested_acc_limited);
+            logger.log_var("acc_test", "a0_limited", a0_limited);
             logger.log_var("acc_test", "v0", v0);
             logger.log_var("acc_test", "requested_vel", requested_vel);
             logger.write_line("acc_test");
@@ -212,7 +341,9 @@ int main(int argc, const char * argv[]) {
             // Screen print
             printLogVar(message_id, "Time", num_seconds);
             printLogVar(message_id, "Status", in->Status);
-            printLogVar(message_id, "a0", a0);
+            printLogVar(message_id, "requested_pedal", requested_pedal);
+            printLogVar(message_id, "requested_acc", requested_acc_limited);
+            printLogVar(message_id, "a0", a0_limited);
             printLogVar(message_id, "requested_vel", requested_vel);
             printLogVar(message_id, "v0", v0);
             printLogVar(message_id, "CycleNumber", in->CycleNumber);

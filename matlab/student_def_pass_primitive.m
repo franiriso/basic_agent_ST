@@ -19,6 +19,6 @@ final_opt_time_pass_fun = matlabFunction(final_opt_time_pass_var(2), 'Vars', [v0
 %   Use 'subs' function to solve the system using the frequency instead of the time
 
 %% Determine the time to reach the minimum velocity
-time_min_vel_var = 1./solve(diff(subs(final_opt_vel_pass_var, T, 1/z), z) == 0, z);
+time_min_vel_var = solve(diff(final_opt_vel_pass_var, T) == 0, T);
 time_min_vel_fun = matlabFunction(time_min_vel_var(2), 'Vars', [a0,sf], 'File', 'time_min_vel.m');
 % - Use functions 'solve', 'diff', 'subs', and 'matlabFunction'

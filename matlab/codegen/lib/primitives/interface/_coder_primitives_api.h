@@ -96,10 +96,11 @@ void student_pass_primitive_api(const mxArray *const prhs[7], int32_T nlhs,
                                 const mxArray *plhs[6]);
 
 void student_pass_primitive_j0(real_T v0, real_T a0, real_T sf, real_T vfmin,
-                               real_T vfmax, real_T coefsj0[6]);
+                               real_T vfmax, real_T coefsj0[6], real_T *vfj0,
+                               real_T *tfj0);
 
-void student_pass_primitive_j0_api(const mxArray *const prhs[5],
-                                   const mxArray **plhs);
+void student_pass_primitive_j0_api(const mxArray *const prhs[5], int32_T nlhs,
+                                   const mxArray *plhs[3]);
 
 void student_stop_primitive(real_T v0, real_T a0, real_T sf, real_T coefs[6],
                             real_T *maxsf, real_T *tf);
