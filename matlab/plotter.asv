@@ -30,7 +30,7 @@ ylim([-1 30])
 
 % Add grid
 
-%% Primitives in time
+%% Read the CSV file
 
 figure(2);
 clf(figure(2));
@@ -39,7 +39,6 @@ grid on;
 box on;
 xlabel('Time [s]');
 ylabel('Velocity [m/s]');
-title('Velocity Profiles vs time');
 
 data = readtable('../../bin/log_internal/coef_list.csv', 'Delimiter', {',', ';'});
 data_test = readtable('../../bin/log_internal/acc_test.csv', 'Delimiter', {',', ';'});
@@ -75,14 +74,14 @@ end
 %     t_plot = t_reduced + t_reduced(i);
 %     plot(t_plot, v_opt, 'g', 'LineWidth',0.5);
 % end
-h_opt = plot(nan, nan, 'g', 'LineWidth',1.5, 'DisplayName','Primitives');
+h_opt = plot(nan, nan, 'g', 'LineWidth',1.5, 'DisplayName','Optimal velocity profiles');
 h1 = plot(data_test.time, data_test.requested_vel,' r--', 'DisplayName', 'Requested Velocity', LineWidth=2);
 h2 = plot(data_test.time, data_test.v0, 'b-', 'DisplayName', 'Velocity', LineWidth=1);
-legend([h_opt h1, h2]);
+legend([h1, h2]);
 ylim([-1 30])
-xlim([0 200])
 
-%% Primitives in space
+
+%% Read the CSV file
 
 figure(3);
 clf(figure(3));
@@ -91,7 +90,6 @@ grid on;
 box on;
 xlabel('Position [m]');
 ylabel('Velocity [m/s]');
-title('Velocity vs Position (Primitives and Tracking)');
 
 data = readtable('../../bin/log_internal/coef_list.csv', 'Delimiter', {',', ';'});
 data_test = readtable('../../bin/log_internal/acc_test.csv', 'Delimiter', {',', ';'});
@@ -118,9 +116,8 @@ for i=1:size(coeffs,1)
     s_opt = coeffs_s_opt(t_plot, coeffs(i,:));
     plot(s0-s(i)+s_opt, v_opt, 'g');
 end
-h_opt = plot(nan, nan, 'g', 'LineWidth',1.5, 'DisplayName','Primitives');
+
 h1 = plot(s0-data.distance, data_test.requested_vel,' r--', 'DisplayName', 'Requested Velocity', LineWidth=2);
 h2 = plot(s0-data.distance, data_test.v0, 'b-', 'DisplayName', 'Velocity', LineWidth=1);
-legend([h_opt h1, h2]);
+legend([h1, h2]);
 ylim([-1 30])
-xlim([0 200])

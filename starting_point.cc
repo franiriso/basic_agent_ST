@@ -94,114 +94,8 @@ int main(int argc, const char * argv[]) {
             double finalTime_2;
             double finalVel_2;
 
-            //  double lookhead;
-            // if (50*vel > 50) { 
-            //     lookhead = 50*vel; 
-            // } else {
-            //     lookhead = 50;
-            // }
-
-            // double coef1[6];
-            // double coef2[6];
-            // double vmin = 3;
-            // double vmax = 15;
-            // double vr = requested_vel;
-            // double xs = 5;
-            // double ts = xs/vmin;
-            // double xin = 10;
-            // double tin = xin/vmin;
-            // double numTrafficLight = in ->NrTrfLights;
-            // double TLCurrentState = in ->TrfLightCurrState;
-            // double TimeFirstChange = in ->TrfLightFirstTimeToChange;
-            // double TimeSecondChange = in ->TrfLightSecondTimeToChange;
-            // double TimeThirdChange = in ->TrfLightThirdTimeToChange;
-            // double xtr;
-            // double xstop;
-            // double tgreen;
-            // double tred;
-            
-            // if (numTrafficLight != 0) {
-
-            //     xtr = distTrafficLight;
-            //     xstop = distTrafficLight - xs/2;
-            // }
-
-            // // CASE 1: NO TRAFFIC LIGHT OR FAR AWAY → FREE FLOW
-            // if (numTrafficLight == 0 || xtr >= lookhead) {
-            //     student_pass_primitive(vel, acc, lookhead, requested_vel, requested_vel, 0, 0, coef, &finalVel, &finalTime, coef, &finalVel, &finalTime);
-            // } 
-            
-            // // CASE 2: VALID TRAFFIC LIGHT → PROCESS STATES
-            // else {
-            //     switch (in->TrfLightCurrState)
-            //     {
-            //     case 1: // Red
-            //         tgreen = 0;
-            //         tred = TimeFirstChange - tin;
-            //         break;
-            //     case 2: // Green
-            //         tgreen = TimeSecondChange + ts;
-            //         tred = TimeThirdChange - tin;
-            //         break; 
-                
-            //     case 3: // Yellow
-            //         tgreen = TimeFirstChange + ts;
-            //         tred = TimeSecondChange - tin;
-            //         break;
-            //     }
-
-            //     // If we are too close to RED, don't try anything → FREE FLOW (just coast)
-            //     if (TLCurrentState == 1 && distTrafficLight <= xs) {
-            //         student_pass_primitive(vel, acc, lookhead, requested_vel, requested_vel, 0, 0, coef, &finalVel, &finalTime, coef, &finalVel, &finalTime);
-
-            //     }
-
-            //     // Otherwise → compute Pass options for current traffic light
-            //     else {
-            //         student_pass_primitive(vel, acc, distTrafficLight, vmin, vmax, tgreen, tred, coef1, &finalVel, &finalTime, coef2, &finalVel, &finalTime);
-
-            //         // Defining coefs 1 and 2 emptyness
-            //         bool empty1 = (coef1[0] == 0 && coef1[1] == 0 && coef1[2] == 0 &&
-            //            coef1[3] == 0 && coef1[4] == 0 && coef1[5] == 0);
-                    
-            //         bool empty2 = (coef2[0] == 0 && coef2[1] == 0 && coef2[2] == 0 &&
-            //            coef2[3] == 0 && coef2[4] == 0 && coef2[5] == 0);
-
-
-            //         // CASE A: Both coefs empty --> STOP TRAJECTORY
-            //         if (empty1 && empty2) {
-            //             student_stop_primitive(vel, acc, xstop, coef, &finalDistance, &finalTime);
-            //         }
-
-            //         // CASE B: Only one valid --> CHOOSE IT
-            //         else if (!empty1 && empty2) {
-            //             memcpy(coef, coef1, sizeof(coef1));
-            //         }
-            //         else if (!empty1 && empty2) {
-            //             memcpy(coef, coef2, sizeof(coef2));
-            //         }
-
-            //         // CASE C: Both valid --> CHECK SIGN CHANGE
-            //         else if ((coef1[3] < 0 && coef2[3] > 0) || (coef1[3] > 0 && coef2[3] < 0)) {
-            //             student_pass_primitive_j0(vel, acc, xtr, vmin, vmax, coef, &finalVel, &finalTime);
-            //         }
-
-            //         // CASE D: Both valid, same sign --> SMALLEST MAGNITUDE
-            //         else {
-            //             if (fabs(coef1[3]) < fabs(coef2[3])) {
-            //                 memcpy(coef, coef1, sizeof(coef1));
-            //             } 
-            //             else {
-            //                 memcpy(coef, coef2, sizeof(coef2));
-            //             }
-            //         }
-            //     }
-            // }
-
             double requested_acc = coeffs_a_opt(DT, coef);
             double requested_vel = coeffs_v_opt(DT, coef);
-            double requested_acc_limited = std::max(-5.0, std::min(5.0, requested_acc));
-            double a0_limited = std::max(-5.0, std::min(5.0, a0));
 
             
             double lookhead_distance = std::max(50.0, v0*5.0);
@@ -288,11 +182,13 @@ int main(int argc, const char * argv[]) {
             // ADD LOW LEVEL CONTROL CODE HERE
             double P_gain = 0.4;
             double I_gain = 1.0;
-            // double W_gain = 1.0; // Windup gain
+            double W_gain = 0.5; // Windup gain
 
-            double aw_gain = 0.5;
+            double requested_acc_limited = std::max(-5.0, std::min(5.0, requested_acc));
+            double a0_limited = std::max(-5.0, std::min(5.0, a0));
+
             double sat_error = (requested_acc_limited - requested_acc) - (a0_limited - a0);
-            double error = (requested_acc - a0) + aw_gain * sat_error;
+            double error = (requested_acc - a0) + W_gain * sat_error;
             if (std::abs(error) < 0.05) {
                 error = 0.0;
             }
@@ -317,8 +213,8 @@ int main(int argc, const char * argv[]) {
             logger.log_var("acc_test", "time", in->ECUupTime);
             logger.log_var("acc_test", "a0", a0);
             logger.log_var("acc_test", "requested_acc", requested_acc);
-            logger.log_var("acc_test", "requested_acc_limited", requested_acc_limited);
-            logger.log_var("acc_test", "a0_limited", a0_limited);
+            logger.log_var("acc_test", "requested_acc_limited", requested_acc);
+            logger.log_var("acc_test", "a0_limited", a0);
             logger.log_var("acc_test", "v0", v0);
             logger.log_var("acc_test", "requested_vel", requested_vel);
             logger.write_line("acc_test");
@@ -342,8 +238,8 @@ int main(int argc, const char * argv[]) {
             printLogVar(message_id, "Time", num_seconds);
             printLogVar(message_id, "Status", in->Status);
             printLogVar(message_id, "requested_pedal", requested_pedal);
-            printLogVar(message_id, "requested_acc", requested_acc_limited);
-            printLogVar(message_id, "a0", a0_limited);
+            printLogVar(message_id, "requested_acc", requested_acc);
+            printLogVar(message_id, "a0", a0);
             printLogVar(message_id, "requested_vel", requested_vel);
             printLogVar(message_id, "v0", v0);
             printLogVar(message_id, "CycleNumber", in->CycleNumber);
@@ -364,3 +260,7 @@ int main(int argc, const char * argv[]) {
     server_agent_close();
     return 0;
 }
+
+
+// FOR VISUALIZING THE PLOTS PLEASE GO TO:
+// basic_agent_st/matlab/plotter.m
